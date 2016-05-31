@@ -1,0 +1,49 @@
+<?php
+class sqlConnectionSingletone
+{
+  private static $instance = null;
+		
+  private $servername;
+  private $username;
+  private $password;
+  private $dbname;
+  
+  private $connection;
+  private $isConnected = false;
+    
+	/**
+     * @return Singleton
+     */
+    public static function getInstance()
+    {
+			if (null === self::$instance)
+			{
+			self::$instance = new self();
+       		           
+            }
+        return self::$instance;
+    }
+    private function __clone() {}
+    private function __construct() {}
+	
+	public function connectToDb($servername, $username, $password, $dbname){
+		
+			$this->connection = @mysql_connect($servername, $username, $password)
+			or die("Could not connect: " . mysql_error());
+			
+			mysql_select_db($dbname, $this->connection)
+			or die("Could not select DB: " . mysql_error());
+			
+			mysql_query("SET NAMES UTF8");
+			
+			$this->isConnected = true;
+	}
+	
+    public function getConnection()
+    {
+        return $this->connection;
+    }
+}
+
+
+?>

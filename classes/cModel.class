@@ -1,0 +1,106 @@
+<?php
+
+class cModel{
+  
+
+  private $connection = null;
+  private $isConnected = false;
+  
+  private $filename;
+  
+  public function setFile($filename){
+	  $this->filename = $filename;
+  }
+  
+  
+ //-----------------------------------------------------------------------------------------------  
+ public function getConnection(){
+	 if(!empty($this->connection)) return $this->connection; 
+	 else return 1;
+ }
+ 
+ public function setConnection($connection){
+	 
+	 $this->connection = $connection;
+	 $this->isConnected = true;
+	 
+ }
+//-----------------------------------------------------------------------------------------------  
+  public function getQueryResult($query) {
+	    
+		if(!$this->isConnected) return 1;
+		
+	    $result_for_fetch = mysql_query($query,$this->getConnection())
+		or die(mysql_error());
+		
+	    $resultSet = array();
+		while($result = mysql_fetch_array($result_for_fetch))
+		{
+			$resultSet[] = $result;
+		}
+		
+	return $resultSet;
+  }
+  
+//----------------------------------------------------------------------------------------------- 
+public function parseLogInToDB(){
+	
+	$lines=file($this->filename);
+    
+	$regex = '/^(\S+) (\S+) (\S+) \[([^:]+):(\d+:\d+:\d+) ([^\]]+)\] \"(\S+) (.*?) (\S+)\" (\S+) (\S+)/';
+
+	
+	
+	mysql_query("truncate table logs_table",$this->getConnection());
+    mysql_query("START TRANSACTION;",$this->getConnection());
+	
+	
+	foreach ($lines as $line) {
+		if(!empty($line)){	
+		 preg_match($regex ,$line, $matches);
+		 
+		 $sql = "INSERT INTO logs_table (ip_address, date, time, method, file_name, http_version, answer_code)
+				VALUES ('$matches[1]', '$matches[4]','$matches[5]','$matches[7]','$matches[8]','$matches[9]','$matches[10]')";
+			mysql_query($sql,$this->getConnection());
+		}
+	}
+    
+	mysql_query("COMMIT;",$this->getConnection()) or die(mysql_error());
+	
+	return 0;
+	
+		
+	 
+  
+	
+   
+  }
+//-----------------------------------------------------------------------------------------------   
+public function get_stat_data($field)
+{
+	if(!$this->isConnected) return 1;
+	
+   	$query = "Select `$field` ,count , count/(select COUNT(`$field`) as count from  `logs_table`)*100 as percent
+from  (SELECT `$field`, count(`$field`) as count FROM `logs_table` group by `$field`) total group by `$field`";
+		
+	return $this->getQueryResult($query);
+ 
+  }
+  
+public function getErrorCodes(){
+	
+  return $this->getQueryResult("select * from error_codes LIMIT 100");
+  
+}
+
+
+public function getLogs(){
+	
+  return $this->getQueryResult("select * from `logs_table` LIMIT 100");
+  
+}
+
+  
+}
+
+?>

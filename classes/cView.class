@@ -263,6 +263,6 @@ public function print_dashboard() {
 	
 }
   
-  }
+}
 
 ?>

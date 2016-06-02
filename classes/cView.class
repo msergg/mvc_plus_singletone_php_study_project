@@ -64,6 +64,46 @@ if($chart=='Chart2'){
  
  } 
   
+  if($chart=='Bar'){
+  
+  $heigth = 500;
+  $length = 230;
+  
+  $getData = $DataSet->GetData();
+  $getDataDescription = $DataSet->GetDataDescription();
+  
+  $Bar = new pChart($heigth ,$length);
+  $Bar->setFontProperties("Fonts/tahoma.ttf",8);
+  $Bar->setGraphArea(50,30,$heigth - 20,$length - 30);
+  $Bar->drawFilledRoundedRectangle(7,7,$heigth - 7,$length - 7,5,240,240,240);
+  $Bar->drawRoundedRectangle(5,5,$heigth - 5,$length - 5,5,230,230,230);
+  $Bar->drawGraphArea(255,255,255,TRUE);
+  $Bar->drawScale($getData,$getDataDescription,SCALE_ADDALLSTART0,150,150,150,TRUE,0,2,TRUE);   
+  $Bar->drawGrid(4,TRUE,230,230,230,50);
+
+ 
+  $Bar->setFontProperties("Fonts/tahoma.ttf",6);
+  $Bar->drawTreshold(0,143,55,72,TRUE,TRUE);
+  
+ 
+  
+  
+  $Bar->drawBarGraph($getData,$getDataDescription,TRUE);
+   
+  
+  $Bar->setFontProperties("Fonts/tahoma.ttf",8);
+  $Bar->drawLegend(596,150,$getDataDescription,255,255,255);
+  $Bar->setFontProperties("Fonts/tahoma.ttf",10);
+  $Bar->drawTitle(50,22,"Date",50,50,50,585);
+  
+ 
+ 
+ 
+ $Bar->Render("charts/$field_name.png");
+ 
+ } 
+ 
+ 
   echo "<img src=\"./charts/$field_name.png\">";
   return 0;
 }
@@ -216,7 +256,7 @@ public function print_dashboard() {
   echo '<div class="col-sm-6">';
       echo '<h2>Date statistic<h2>';
 	  $date_data = $this->print_stats("date");
-	  $this->draw_pie_chart("date",$date_data,"Chart2");
+	  $this->draw_pie_chart("date",$date_data,"Bar");
 	  
   
 	   echo '<h2>Methods statistic<h2>';

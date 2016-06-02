@@ -59,6 +59,10 @@ public function parseLogInToDB(){
 		if(!empty($line)){	
 		 preg_match($regex ,$line, $matches);
 		 
+		 if($matches[1] == '127.0.0.1'){
+			 continue;
+		 }
+		 
 		 $sql = "INSERT INTO logs_table (ip_address, date, time, method, file_name, http_version, answer_code)
 				VALUES ('$matches[1]', '$matches[4]','$matches[5]','$matches[7]','$matches[8]','$matches[9]','$matches[10]')";
 			mysql_query($sql,$this->getConnection());
